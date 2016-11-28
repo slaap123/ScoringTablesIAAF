@@ -63,6 +63,12 @@ public class ExtrapolateFunction {
         for (int i = 0; i < 6; i++) {
             findSweetSpot(i % 3);
         }
+        for (Double m : points.keySet()) {
+                double waarde = functie.doOperation(m, a, b, c);
+                if (Math.round(waarde) != points.get(m)) {
+                    System.out.println(waarde+" != "+points.get(m));
+                }
+        }
         SaveValues();
     }
 
@@ -123,16 +129,17 @@ public class ExtrapolateFunction {
             }
             Prefafwijking = afwijking;
             afwijking = 0;
-        } while (localPoging < 100000 && lastAantal != points.size());
+        } while (localPoging < REPEATS && lastAantal != points.size());
         if(bestAantal>lastAantal){
                 a=bestA;
                 b=bestB;
                 c=bestC;
             }
         System.out.println("aantal Changes=" + localPoging);
-        System.out.println("aantal goed" + lastAantal);
+        System.out.println("aantal goed" + lastAantal+"/"+points.size());
         poging += localPoging;
     }
+    private static final int REPEATS = 100000;
 
     private void LoadSavedValues() {
         String line = "";
