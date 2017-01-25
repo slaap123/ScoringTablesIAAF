@@ -9,6 +9,7 @@ import iaaf.EventScoringTable;
 import iaaf.ScoringFileConverter;
 import iaaf.ScoringTables;
 import java.util.Map;
+import java.util.Scanner;
 import visual.GraphWindow;
 
 /**
@@ -34,14 +35,35 @@ public class IAAFScoring {
         ScoringFileConverter converter = new ScoringFileConverter();
         ScoringTables fullTable;
         try {
-            fullTable = converter.convert("IAAF Scoring Tables of Athletics - Indoor.xls");
+            fullTable = converter.convert("IAAF Scoring Tables of Athletics - Outdoor.xls");
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return;
         }
-        EventScoringTable tjMen = fullTable.getEventScoringTable("TJ", "Men");
-        tjMen.setFunctie(new ABCFormuleCeil());
-        GraphWindow.createAndShowGui(tjMen.getScorings(),ExtrapolateFunction.Extrapolate(tjMen));
+        ScoringTables fullTable2;
+        try {
+            fullTable2 = converter.convert("IAAF Scoring Tables of Athletics - Indoor -2017.xls");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return;
+        }        
+        /*EventScoringTable men100 = fullTable.getEventScoringTable("200m", "Women");
+        EventScoringTable men60 = fullTable2.getEventScoringTable("60m", "Women");
+        double input=-1;
+        Scanner scan=new Scanner(System.in);
+        do{
+            input=scan.nextDouble();
+            if(input==-1){
+                break;
+            }
+            System.out.println(input);
+            int p100=men100.GetPoints(input);
+            System.out.println(p100);
+            double pr60=men60.Getperformance(p100);
+            System.out.println(pr60);
+        }while(input!=-1);*/
+        //men.setFunctie(new IaafFunction());
+        //GraphWindow.createAndShowGui(men.getScorings(),ExtrapolateFunction.Extrapolate(men));
         
         //EventScoringTable tjWomen = fullTable.getEventScoringTable("TJ", "Women");
         //tjWomen.setFunctie(new ABCFormule());

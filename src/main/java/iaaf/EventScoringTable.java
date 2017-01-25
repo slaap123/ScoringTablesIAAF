@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import org.apache.commons.collections4.KeyValue;
 
 /**
  * Stores Scoring of one event.
@@ -29,19 +30,30 @@ public class EventScoringTable {
 
         // Exit and print warnings if either performance or points were already added before.
         if ( ! pointIsInserted ) {
-            System.out.printf( "WARNING: '%d' points was already added to '%s'.%n", point, mEventName );
+            //System.out.printf( "WARNING: '%d' points was already added to '%s'.%n", point, mEventName );
             return;
         }
 
         if ( mScorings.containsKey( performance ) ) {
-            System.out.printf( "WARNING: Performance of '%.2f' was already added to '%s'.%n", performance, mEventName );
+            //System.out.printf( "WARNING: Performance of '%.2f' was already added to '%s'.%n", performance, mEventName );
             return;
         }
 
         mScorings.put(performance, point);
 
     }
-
+    public Integer GetPoints(Double performance){
+        return(mScorings.get(performance));
+    }
+    public Double Getperformance(Integer point){
+        for (Map.Entry<Double,Integer> kv : mScorings.entrySet()) {
+            if(kv.getValue()<=point){
+                return kv.getKey();
+            }
+        }
+        return null;
+    }
+    
     public Set<Integer> getPoints() {
         return mPoints;
     }

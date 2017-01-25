@@ -13,6 +13,15 @@ public class IaafFunction implements Function{
 
     @Override
     public int doOperation(double m,double a, double b, double c) {
-        return (int) Math.round(Math.pow(a*(m - b), c));
+        return doOperation(m,a,b,c,false);
+    }
+
+    @Override
+    public int doOperation(Double m, double a, double b, double c, boolean print) {
+        double waarde = Math.pow(a*(m - b), c);
+        if(print){
+            System.out.print(waarde);
+        }
+        return (int)Math.round(waarde);
     }
 }

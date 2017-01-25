@@ -12,5 +12,7 @@ package functions;
 public interface Function {
 
     public int doOperation(double m, double a, double b, double c);
+
+    public int doOperation(Double m, double a, double b, double c, boolean print);
     
 }

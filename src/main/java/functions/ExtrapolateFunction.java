@@ -13,7 +13,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +37,8 @@ public class ExtrapolateFunction {
     private Map<Double, Integer> points;
     private final String CSV_FILE = "src/main/resources/Formulas.csv";
     private static final String cvsSplitBy = ",";
+
+    private static final int REPEATS = 10000;
 
     public static Map<Double, Integer> Extrapolate(EventScoringTable table) {
 
@@ -56,28 +62,61 @@ public class ExtrapolateFunction {
         this.TableName = table.TableName();
         c = points.keySet().toArray(new Double[0])[0];
     }
+    private Stack<Integer[]> order = new Stack<Integer[]>();
+
+    public void permutations(Set<Integer> items, Stack<Integer> permutation, int size) {
+
+        /* permutation stack has become equal to size that we require */
+        if (permutation.size() == size) {
+            /* print the permutation */
+            order.add(permutation.toArray(new Integer[0]));
+        }
+
+        /* items available for permutation */
+        Integer[] availableItems = items.toArray(new Integer[0]);
+        for (Integer i : availableItems) {
+            /* add current item */
+            permutation.push(i);
+
+            /* remove item from available item set */
+            items.remove(i);
+
+            /* pass it on for next permutation */
+            permutations(items, permutation, size);
+
+            /* pop and put the removed item back */
+            items.add(permutation.pop());
+        }
+    }
 
     private void findSweetSpot() {
         LoadSavedValues();
+        Set<Integer> s = new HashSet<Integer>();
+        s.add(0);
+        s.add(1);
+        s.add(2);
 
-        for (int i = 0; i < 6; i++) {
-            findSweetSpot(i % 3);
+        permutations(s, new Stack<Integer>(), s.size());
+        while (!order.isEmpty()) {
+            for (int i = 0; i < order.peek().length; i++) {
+                findSweetSpot(order.peek()[i]);
+            }
+            order.pop();
         }
         for (Double m : points.keySet()) {
-                double waarde = functie.doOperation(m, a, b, c);
-                if (Math.round(waarde) != points.get(m)) {
-                    System.out.println(waarde+" != "+points.get(m));
-                }
+            int waarde = functie.doOperation(m, a, b, c, false);
+            if (Math.round(waarde) != points.get(m)) {
+                functie.doOperation(m, a, b, c, true);
+                System.out.println(" != " + points.get(m) + "(" + m + ")");
+            }
         }
         SaveValues();
     }
 
-    
-
     private void findSweetSpot(int varI) {
-        int bestAantal=0;
-        Double bestA=0.0,bestB=0.0,bestC=0.0;
-        
+        int bestAantal = 0;
+        Double bestA = a, bestB = b, bestC = c;
+
         int localPoging = 0;
         int lastDir = 1;
         int dirswitches = 0;
@@ -106,18 +145,22 @@ public class ExtrapolateFunction {
                 }
                 afwijking += Math.abs(Math.round(waarde) - points.get(m));
             }
-            if(bestAantal<lastAantal){
-                bestAantal=lastAantal;
-                bestA=a;
-                bestB=b;
-                bestC=c;
+            if (bestAantal < lastAantal) {
+                bestAantal = lastAantal;
+                bestA = a;
+                bestB = b;
+                bestC = c;
+                System.out.println("newBest");
             }
             if (afwijking > Prefafwijking) {
                 if (dirswitches >= 2) {
-                    if(bestAantal>lastAantal){
-                        a=bestA;
-                        b=bestB;
-                        c=bestC;
+                    if (bestAantal > lastAantal) {
+                        lastAantal = bestAantal;
+                        a = bestA;
+                        b = bestB;
+                        c = bestC;
+                        
+                System.out.println("rest mid way");
                     }
                     scale *= 10;
                     lastDir *= -1;
@@ -130,16 +173,16 @@ public class ExtrapolateFunction {
             Prefafwijking = afwijking;
             afwijking = 0;
         } while (localPoging < REPEATS && lastAantal != points.size());
-        if(bestAantal>lastAantal){
-                a=bestA;
-                b=bestB;
-                c=bestC;
-            }
+        if (bestAantal > lastAantal) {
+            a = bestA;
+            b = bestB;
+            c = bestC;
+            System.out.println("reset");
+        }
         System.out.println("aantal Changes=" + localPoging);
-        System.out.println("aantal goed" + lastAantal+"/"+points.size());
+        System.out.println("aantal goed" + lastAantal + "/" + points.size());
         poging += localPoging;
     }
-    private static final int REPEATS = 100000;
 
     private void LoadSavedValues() {
         String line = "";

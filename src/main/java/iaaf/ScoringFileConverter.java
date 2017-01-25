@@ -98,6 +98,7 @@ public class ScoringFileConverter {
             System.out.printf( "'%s'%n", sheet.getSheetName() );
             System.out.println(currentHeader);
             System.out.println("WARNING: the header of this sheet contains an enter. Does it contain an extra row?");
+            
         } else if (currentHeader.size() <= 2) {
             System.out.printf( "'%s'%n", sheet.getSheetName() );
             System.out.println(currentHeader);
